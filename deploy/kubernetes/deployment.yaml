@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: custom-provisioner
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: custom-provisioner
+  template:
+    metadata:
+      labels:
+        app: custom-provisioner
+    spec:
+      containers:
+        - name: custom-provisioner
+          image: siming.net/sre/custom-provisioner:main_dc62f09_2024-09-29-010124
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: PROVISIONER_NAME
+              value: custom-provisioner
+          volumeMounts:
+            - mountPath: /tmp
+              name: tmp-dir
+      volumes:
+        - name: tmp-dir
+          hostPath:
+            path: /tmp
+            type: Directory
